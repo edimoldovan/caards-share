@@ -1,0 +1,13 @@
+{
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edimoldovan/cards"
+  },
+  "dependencies": {
+    "blipp": "^2.2.1",
+    "hapi": "^9.0.3",
+    "hapi-mongo-models": "^2.2.0",
+    "joi": "^6.6.1",
+    "object-assign": "^4.0.1"
+  }
+}
