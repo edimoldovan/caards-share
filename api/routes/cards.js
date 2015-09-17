@@ -6,7 +6,7 @@ module.exports = [
     method: "GET",
     path: "/api/cards",
     config: {
-      //auth: "token",
+      auth: "token",
       description: "Retrieve shared cards",
       notes: "blah blah",
       tags: ["api"],
@@ -17,7 +17,7 @@ module.exports = [
     method: "POST",
     path: "/api/cards",
     config: {
-      //auth: "token",
+      auth: "token",
       description: "Share card",
       notes: "blah blah",
       tags: ["api"],

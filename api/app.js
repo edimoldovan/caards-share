@@ -1,3 +1,5 @@
+var config = require("config");
+var privateKey = config.get("auth.privateKey");
 var Hapi = require("hapi");
 var Blipp = require("blipp");
 var server = new Hapi.Server({
@@ -19,13 +21,13 @@ var hapiMongoModels = {
   }
 };
 
-var swaggerOptions = {
-  authorizations: {
-    type: "apiKey",
-    authorizations: "header",
-    keyname: "Authorization"
-  },
-  documentationPath: "/api/documentation"
+var accounts = {
+  123: {
+    id: 123,
+    user: 'john',
+    fullName: 'John Doe',
+    scope: ['a', 'b']
+  }
 };
 
 server.on("log", function (logData, tags) {
@@ -43,12 +45,30 @@ server.register(hapiMongoModels, function (err) {
   }
 });
 
+var validate = function (request, decodedToken, callback) {
+
+  var error = null;
+  var credentials = accounts[decodedToken.accountId] || {};
+
+  if (!credentials) {
+    return callback(error, false, credentials);
+  }
+
+  return callback(error, true, credentials)
+};
+
 server.connection({
   host: "0.0.0.0",
   port: 8000
 });
 
-server.route(routes);
+server.register({register: require("hapi-auth-jwt")}, function (err) {
+  server.auth.strategy("token", "jwt", {
+    key: privateKey,
+    validateFunc: validate
+  });
+  server.route(routes);
+});
 
 server.register(Blipp, function(err) {
   server.register([
@@ -56,7 +76,9 @@ server.register(Blipp, function(err) {
     require("vision"),
     {
       register: require("hapi-swagger"),
-      options: swaggerOptions
+      options: {
+        documentationPath: "/api/documentation"
+      }
     }], function (err) {
     server.start(function() {
       // Add any server.route() config here
